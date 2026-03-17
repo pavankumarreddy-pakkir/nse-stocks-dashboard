@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NSE Intelligence Dashboard â€” 2026-03-17</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* â”€â”€ RESET & BASE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0f1117;color:#e0e0e0;min-height:100vh;}
+a{color:#64b5f6;text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+/* â”€â”€ NAV â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.nav{
+  position:sticky;top:0;z-index:999;
+  background:linear-gradient(135deg,#1a1a2e,#16213e);
+  border-bottom:2px solid #2979ff;
+  padding:10px 20px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+}
+.nav-brand{
+  font-size:17px;font-weight:700;color:#64b5f6;
+  margin-right:16px;letter-spacing:0.5px;
+}
+.nav-time{font-size:11px;color:#aaa;margin-right:auto;}
+.nav-btn{
+  padding:5px 12px;border-radius:16px;font-size:12px;font-weight:600;
+  cursor:pointer;border:none;transition:all 0.2s;
+}
+.nav-btn.active,.nav-btn:hover{
+  background:#2979ff;color:white;box-shadow:0 2px 8px rgba(41,121,255,0.4);
+}
+.nav-btn:not(.active){background:#1e2532;color:#aaa;}
+.nav-badge{
+  background:#dc3545;color:white;border-radius:8px;padding:1px 6px;
+  font-size:10px;margin-left:4px;
+}
+
+/* â”€â”€ PAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.page{display:none;padding:20px;max-width:1600px;margin:0 auto;}
+.page.active{display:block;}
+
+/* â”€â”€ PAGE HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.page-header{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;padding-bottom:12px;
+  border-bottom:2px solid #1e2532;
+}
+.page-title{font-size:22px;font-weight:700;color:#64b5f6;}
+.page-sub{font-size:13px;color:#888;margin-top:2px;}
+.market-badge{
+  padding:4px 14px;border-radius:16px;font-size:13px;font-weight:700;
+  background:#fff3cd;color:#856404;
+  border:1px solid currentColor;
+}
+
+/* â”€â”€ GRID LAYOUTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.grid-macros{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;margin-bottom:24px;}
+.grid-picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+.grid-sectors{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+.grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.grid-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:900px){
+  .grid-2col,.grid-3col{grid-template-columns:1fr;}
+  .grid-picks{grid-template-columns:1fr;}
+}
+
+/* â”€â”€ MACRO CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.macro-card{
+  background:#1a1f2e;border-radius:10px;padding:12px;
+  border:1px solid #2a2f3f;transition:transform 0.15s,box-shadow 0.15s;
+}
+.macro-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.4);}
+.macro-name{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;}
+.macro-price{font-size:16px;font-weight:700;margin:4px 0;}
+.macro-chg{font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;}
+.spark-wrap{height:40px;margin-top:8px;}
+
+/* â”€â”€ PICK CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.pick-card{
+  background:#1a1f2e;border-radius:12px;
+  border:1px solid #2a2f3f;overflow:hidden;
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+.pick-card:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(0,0,0,0.5);}
+.buy-card{border-top:4px solid #28a745;}
+.sell-card{border-top:4px solid #dc3545;}
+.pick-header{
+  display:flex;align-items:center;flex-wrap:wrap;gap:8px;
+  padding:12px 16px;background:#12151f;
+}
+.pick-rank{
+  width:28px;height:28px;background:#2979ff;color:white;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.pick-sym{font-size:18px;font-weight:700;color:#fff;margin-right:auto;}
+.pick-grade{
+  padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;color:white;
+}
+.pick-score{font-size:17px;font-weight:700;color:#64b5f6;}
+.score-label{font-size:10px;color:#888;}
+.pick-dir{font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;}
+.buy-dir{background:#d4edda;color:#155724;}
+.sell-dir{background:#f8d7da;color:#721c24;}
+.pick-layers{font-size:11px;color:#aaa;}
+.fno-badge{
+  background:#e3f2fd;color:#0c5460;padding:1px 6px;border-radius:6px;font-size:10px;margin-left:4px;
+}
+.pick-body{display:flex;gap:12px;padding:14px;}
+.pick-levels{flex:1;min-width:0;}
+.pick-radar{width:170px;flex-shrink:0;}
+.level-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 10px;border-radius:6px;margin-bottom:5px;
+}
+.entry-row{background:#1e2532;}
+.t1-row{background:#1a2d1e;}
+.t2-row{background:#162419;}
+.sl-row{background:#2d1a1a;}
+.lbl{font-size:12px;color:#aaa;}
+.lbl small{font-size:10px;color:#888;margin-left:4px;}
+.val{font-size:14px;font-weight:700;color:#fff;font-family:monospace;}
+.rsi-val{font-weight:700;font-family:monospace;}
+.pick-reasons{
+  padding:10px 16px;font-size:11px;color:#aaa;
+  background:#12151f;border-top:1px solid #1e2532;
+  line-height:1.5;
+}
+.pick-timeframe{
+  padding:4px 16px;font-size:10px;color:#64b5f6;
+  background:#0d1117;border-top:1px solid #1e2532;
+}
+.no-picks{
+  padding:30px;text-align:center;color:#888;font-size:15px;
+  background:#1a1f2e;border-radius:12px;border:2px dashed #2a2f3f;
+}
+
+/* â”€â”€ SECTOR CARD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.sector-card{
+  background:#1a1f2e;border-radius:10px;padding:14px;
+  border:1px solid #2a2f3f;
+}
+.sec-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.sec-icon{font-size:18px;}
+.sec-name{font-size:14px;font-weight:700;color:#fff;}
+.sec-trend{
+  margin-left:auto;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;
+}
+.sec-avg{font-size:20px;font-weight:700;margin:6px 0;}
+.sec-stocks{display:flex;flex-wrap:wrap;gap:6px;}
+.sec-stock{
+  background:#12151f;border-radius:6px;padding:3px 8px;
+  display:flex;gap:6px;align-items:center;
+}
+.sec-sym{font-size:11px;color:#aaa;}
+.sec-p{font-size:12px;font-weight:700;}
+.sec-spark{height:35px;margin-top:8px;}
+
+/* â”€â”€ TABLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{
+  background:#12151f;color:#aaa;padding:10px 12px;
+  text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;
+  border-bottom:2px solid #2a2f3f;
+}
+.data-table td{padding:9px 12px;border-bottom:1px solid #1e2532;vertical-align:middle;}
+.data-table tr:hover td{background:#1a1f2e;}
+.win-row td{background:rgba(40,167,69,0.05)!important;}
+.lose-row td{background:rgba(220,53,69,0.05)!important;}
+.wr-bar-wrap{display:flex;align-items:center;gap:6px;}
+.wr-bar{height:8px;border-radius:4px;min-width:2px;max-width:120px;}
+.wr-pct{font-size:11px;color:#aaa;white-space:nowrap;}
+
+/* â”€â”€ STAT CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.stat-card{
+  background:#1a1f2e;border-radius:10px;padding:16px;
+  border:1px solid #2a2f3f;text-align:center;
+}
+.stat-val{font-size:26px;font-weight:700;color:#64b5f6;}
+.stat-lbl{font-size:12px;color:#888;margin-top:4px;}
+.stat-sub{font-size:11px;color:#aaa;margin-top:2px;}
+
+/* â”€â”€ SECTION TITLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.section-title{
+  font-size:15px;font-weight:700;color:#64b5f6;
+  margin:20px 0 12px;padding-bottom:8px;
+  border-bottom:1px solid #1e2532;
+  display:flex;align-items:center;gap:8px;
+}
+
+/* â”€â”€ CHART CONTAINER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.chart-box{
+  background:#1a1f2e;border-radius:10px;padding:16px;
+  border:1px solid #2a2f3f;
+}
+.chart-title{font-size:13px;color:#aaa;margin-bottom:12px;font-weight:600;}
+.chart-container{position:relative;}
+
+/* â”€â”€ ALERT BANNER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.alert-banner{
+  background:#fff3cd;color:#856404;
+  border-radius:8px;padding:10px 16px;margin-bottom:16px;
+  font-size:13px;font-weight:600;border:1px solid currentColor;
+}
+
+/* â”€â”€ RISK WARNING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.risk-warning{
+  background:#1a1f2e;border:1px solid #333;border-radius:8px;
+  padding:10px 16px;font-size:11px;color:#888;margin-top:20px;
+  line-height:1.6;
+}
+
+/* â”€â”€ FOOTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.footer{
+  text-align:center;padding:20px;color:#555;font-size:11px;
+  border-top:1px solid #1e2532;margin-top:30px;
+}
+
+/* â”€â”€ SCROLLBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:#0f1117;}
+::-webkit-scrollbar-thumb{background:#2a2f3f;border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:#404560;}
+
+/* â”€â”€ LIVE INDICATOR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.live-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:#28a745;animation:blink 1.5s infinite;margin-right:4px;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* â”€â”€ TOOLTIP STYLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+[data-tip]{position:relative;cursor:help;}
+[data-tip]::after{
+  content:attr(data-tip);
+  position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
+  background:#333;color:#fff;padding:4px 8px;border-radius:6px;
+  font-size:11px;white-space:nowrap;display:none;z-index:100;
+}
+[data-tip]:hover::after{display:block;}
+
+/* â”€â”€ SUMMARY METRICS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.summary-metrics{
+  display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;
+}
+.sm-item{
+  flex:1;min-width:120px;
+  background:#1a1f2e;border-radius:8px;padding:12px;
+  border-left:3px solid #2979ff;
+}
+.sm-val{font-size:18px;font-weight:700;}
+.sm-lbl{font-size:11px;color:#888;}
+</style>
+</head>
+<body>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• NAV -->
+<nav class="nav">
+  <div class="nav-brand">ðŸ“ˆ NSE Intelligence</div>
+  <div class="nav-time"><span class="live-dot"></span>17 Mar 2026  20:08 IST</div>
+  <button class="nav-btn active" onclick="showPage('p1',this)">ðŸŒ Overview</button>
+  <button class="nav-btn" onclick="showPage('p2',this)">â–² BUY Today<span class="nav-badge">3</span></button>
+  <button class="nav-btn" onclick="showPage('p3',this)">â–¼ SELL Today<span class="nav-badge">5</span></button>
+  <button class="nav-btn" onclick="showPage('p4',this)">ðŸ“… Tomorrow</button>
+  <button class="nav-btn" onclick="showPage('p5',this)">ðŸ“Š Week Swing</button>
+  <button class="nav-btn" onclick="showPage('p6',this)">ðŸ“† 1 Month</button>
+  <button class="nav-btn" onclick="showPage('p7',this)">ðŸ­ Sectors</button>
+  <button class="nav-btn" onclick="showPage('p8',this)">ðŸ“š History &amp; Stats</button>
+  <button class="nav-btn" onclick="showPage('p9',this)">ðŸŒ Global Markets</button>
+</nav>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE 1: MARKET OVERVIEW -->
+<div id="p1" class="page active">
+  <div class="page-header">
+    <div>
+      <div class="page-title">ðŸŒ Market Overview â€” 2026-03-17</div>
+      <div class="page-sub">Live macro snapshot Â· All major indices Â· Global signals Â· Sector rotation</div>
+    </div>
+    <div class="market-badge">NEUTRAL MARKET</div>
+  </div>
+
+  <div class="alert-banner">
+    ðŸŸ¡ NEUTRAL MARKET â€” Mixed signals. Selective trades only. Prefer high-conviction setups.
+    &nbsp;|&nbsp; Nifty: <b>+0.74% today</b>
+    
+  </div>
+
+  <!-- SUMMARY STATS -->
+  <div class="summary-metrics">
+    <div class="sm-item">
+      <div class="sm-val" style="color:#28a745;">+0.74%</div>
+      <div class="sm-lbl">Nifty 50 (today)</div>
+    </div>
+    <div class="sm-item">
+      <div class="sm-val" style="color:#28a745;">+0.85%</div>
+      <div class="sm-lbl">Bank Nifty</div>
+    </div>
+    <div class="sm-item">
+      <div class="sm-val">0.0</div>
+      <div class="sm-lbl">India VIX</div>
+    </div>
+    <div class="sm-item">
+      <div class="sm-val" style="color:#28a745;">3</div>
+      <div class="sm-lbl">BUY Picks Today</div>
+    </div>
+    <div class="sm-item">
+      <div class="sm-val" style="color:#dc3545;">5</div>
+      <div class="sm-lbl">SHORT Picks Today</div>
+    </div>
+    <div class="sm-item">
+      <div class="sm-val" style="color:#64b5f6;">0%</div>
+      <div class="sm-lbl">BUY Win Rate (DB)</div>
+    </div>
+  </div>
+
+  <!-- KEY INDICES -->
+  <div class="section-title">ðŸ“Š Key Indices & Markets</div>
+  <div class="grid-macros">
+    <div class="macro-card">
+      <div class="macro-name">Nifty 50</div>
+      <div class="macro-price" style="color:#155724;">23,581.15</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.74%
+      </div>
+      <div class="spark-wrap"><canvas id="chart1" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart1'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [23866.85, 23639.15, 23151.1, 23408.8, 23581.15], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Bank Nifty</div>
+      <div class="macro-price" style="color:#155724;">54,876.00</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.85%
+      </div>
+      <div class="spark-wrap"><canvas id="chart2" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart2'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [55735.75, 55100.95, 53757.85, 54413.4, 54876.0], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">S&P 500</div>
+      <div class="macro-price" style="color:#155724;">6,734.46</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.52%
+      </div>
+      <div class="spark-wrap"><canvas id="chart3" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart3'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [6775.8, 6672.62, 6632.19, 6699.38, 6734.46], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Nasdaq</div>
+      <div class="macro-price" style="color:#155724;">22,508.88</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.60%
+      </div>
+      <div class="spark-wrap"><canvas id="chart4" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart4'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [22716.13, 22311.98, 22105.36, 22374.18, 22508.88], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">US VIX</div>
+      <div class="macro-price" style="color:#721c24;">22.40</div>
+      <div class="macro-chg" style="background:#f8d7da;color:#721c24;">
+        â–¼ -4.72%
+      </div>
+      <div class="spark-wrap"><canvas id="chart5" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart5'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [24.23, 27.29, 27.19, 23.51, 22.4], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Crude Oil</div>
+      <div class="macro-price" style="color:#155724;">94.20</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.75%
+      </div>
+      <div class="spark-wrap"><canvas id="chart6" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart6'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [95.73, 98.71, 93.5, 94.2], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Gold</div>
+      <div class="macro-price" style="color:#155724;">5,014.30</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.41%
+      </div>
+      <div class="spark-wrap"><canvas id="chart7" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart7'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [5115.8, 5052.5, 4994.0, 5014.3], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">USD/INR</div>
+      <div class="macro-price" style="color:#721c24;">92.38</div>
+      <div class="macro-chg" style="background:#f8d7da;color:#721c24;">
+        â–¼ -0.20%
+      </div>
+      <div class="spark-wrap"><canvas id="chart8" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart8'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [92.17, 92.23, 92.39, 92.56, 92.38], "borderColor": "#28a745", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(40,167,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">DXY Index</div>
+      <div class="macro-price" style="color:#155724;">100.36</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.62%
+      </div>
+      <div class="spark-wrap"><canvas id="chart9" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart9'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [98.83, 99.23, 99.74, 100.36], "borderColor": "#28a745", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(40,167,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">US 10Y Yield</div>
+      <div class="macro-price" style="color:#721c24;">4.20</div>
+      <div class="macro-chg" style="background:#f8d7da;color:#721c24;">
+        â–¼ -0.52%
+      </div>
+      <div class="spark-wrap"><canvas id="chart10" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart10'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [4.21, 4.27, 4.28, 4.22, 4.2], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Hang Seng</div>
+      <div class="macro-price" style="color:#155724;">25,868.54</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.13%
+      </div>
+      <div class="spark-wrap"><canvas id="chart11" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart11'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [25898.76, 25716.76, 25465.6, 25834.02, 25868.54], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Natural Gas</div>
+      <div class="macro-price" style="color:#155724;">3.07</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +1.59%
+      </div>
+      <div class="spark-wrap"><canvas id="chart12" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart12'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [3.23, 3.13, 3.02, 3.07], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Silver</div>
+      <div class="macro-price" style="color:#155724;">80.81</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.68%
+      </div>
+      <div class="spark-wrap"><canvas id="chart13" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart13'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [84.67, 80.91, 80.26, 80.81], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Dow Jones</div>
+      <div class="macro-price" style="color:#155724;">47,108.24</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.34%
+      </div>
+      <div class="spark-wrap"><canvas id="chart14" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart14'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [47417.27, 46677.85, 46558.47, 46946.41, 47108.24], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div></div>
+
+  <!-- SECTOR + GLOBAL summary charts -->
+  <div class="grid-2col">
+    <div class="chart-box">
+      <div class="chart-title">Sector Performance Today (%)</div>
+      <div class="chart-container" style="height:260px;">
+        <canvas id="chart43"></canvas>
+      </div>
+      <script>new Chart(document.getElementById('chart43'),{"type": "bar", "data": {"labels": ["Banking & Fina", "IT & Technolog", "Pharma & Healt", "Auto & EV", "Energy & Oil", "Metals & Minin", "FMCG & Consume", "Real Estate", "Infra & Capita", "Defence & PSU", "Chemicals & Sp", "Consumer Discr"], "datasets": [{"data": [0.78, -0.88, 0.05, 1.65, -0.04, 2.45, -0.71, 1.74, 1.35, 2.27, 1.06, 0.19], "backgroundColor": ["#28a745", "#dc3545", "#28a745", "#28a745", "#dc3545", "#28a745", "#dc3545", "#28a745", "#28a745", "#28a745", "#28a745", "#28a745"], "borderRadius": 4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"ticks": {"font": {"size": 10}}, "grid": {"display": false}}, "y": {"ticks": {"font": {"size": 10}}}}}});</script>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Global Markets (%)</div>
+      <div class="chart-container" style="height:260px;">
+        <canvas id="chart44"></canvas>
+      </div>
+      <script>new Chart(document.getElementById('chart44'),{"type": "bar", "data": {"labels": ["S&P 500", "Nasdaq", "Hang Seng", "Nifty 50", "Bank Nifty"], "datasets": [{"data": [0.52, 0.6, 0.13, 0.74, 0.85], "backgroundColor": ["#28a745", "#28a745", "#28a745", "#28a745", "#28a745"], "borderRadius": 4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"ticks": {"font": {"size": 10}}, "grid": {"display": false}}, "y": {"ticks": {"font": {"size": 10}}}}}});</script>
+    </div>
+  </div>
+
+  <!-- QUICK win-rate summary -->
+  <div class="section-title" style="margin-top:24px;">ðŸ“ˆ System Performance Snapshot</div>
+  <div class="grid-3col">
+    <div class="chart-box">
+      <div class="chart-title">BUY System Win Rate</div>
+      <div class="chart-container" style="height:200px;">
+        <canvas id="chart41"></canvas>
+      </div>
+      <script>new Chart(document.getElementById('chart41'),{"type": "doughnut", "data": {"labels": ["Win", "Loss", "Neutral"], "datasets": [{"data": [0, 0, 0], "backgroundColor": ["#28a745", "#dc3545", "#6c757d"], "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"position": "bottom", "labels": {"font": {"size": 11}}}}}});</script>
+      <div style="text-align:center;margin-top:8px;font-size:13px;color:#aaa;">
+        0W / 0L / 0 total
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">SHORT System Win Rate</div>
+      <div class="chart-container" style="height:200px;">
+        <canvas id="chart42"></canvas>
+      </div>
+      <script>new Chart(document.getElementById('chart42'),{"type": "doughnut", "data": {"labels": ["Win", "Loss", "Neutral"], "datasets": [{"data": [0, 0, 10], "backgroundColor": ["#28a745", "#dc3545", "#6c757d"], "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"position": "bottom", "labels": {"font": {"size": 11}}}}}});</script>
+      <div style="text-align:center;margin-top:8px;font-size:13px;color:#aaa;">
+        0W / 0L / 10 total
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Commodities & Currencies</div>
+      <div class="grid-macros" style="grid-template-columns:1fr 1fr;">
+    <div class="macro-card">
+      <div class="macro-name">Crude Oil</div>
+      <div class="macro-price" style="color:#155724;">94.20</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.75%
+      </div>
+      <div class="spark-wrap"><canvas id="chart45" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart45'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [95.73, 98.71, 93.5, 94.2], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Gold</div>
+      <div class="macro-price" style="color:#155724;">5,014.30</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.41%
+      </div>
+      <div class="spark-wrap"><canvas id="chart46" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart46'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [5115.8, 5052.5, 4994.0, 5014.3], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Silver</div>
+      <div class="macro-price" style="color:#155724;">80.81</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.68%
+      </div>
+      <div class="spark-wrap"><canvas id="chart47" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart47'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [84.67, 80.91, 80.26, 80.81], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Natural Gas</div>
+      <div class="macro-price" style="color:#155724;">3.07</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +1.59%
+      </div>
+      <div class="spark-wrap"><canvas id="chart48" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart48'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [3.23, 3.13, 3.02, 3.07], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">USD/INR</div>
+      <div class="macro-price" style="color:#721c24;">92.38</div>
+      <div class="macro-chg" style="background:#f8d7da;color:#721c24;">
+        â–¼ -0.20%
+      </div>
+      <div class="spark-wrap"><canvas id="chart49" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart49'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [92.17, 92.23, 92.39, 92.56, 92.38], "borderColor": "#28a745", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(40,167,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">DXY Index</div>
+      <div class="macro-price" style="color:#155724;">100.36</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.62%
+      </div>
+      <div class="spark-wrap"><canvas id="chart50" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart50'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [98.83, 99.23, 99.74, 100.36], "borderColor": "#28a745", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(40,167,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">US 10Y Yield</div>
+      <div class="macro-price" style="color:#721c24;">4.20</div>
+      <div class="macro-chg" style="background:#f8d7da;color:#721c24;">
+        â–¼ -0.52%
+      </div>
+      <div class="spark-wrap"><canvas id="chart51" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart51'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [4.21, 4.27, 4.28, 4.22, 4.2], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE 2: BUY TODAY -->
+<div id="p2" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">â–² BUY Picks â€” Today Intraday</div>
+      <div class="page-sub">Buy low â†’ Sell high same day Â· MIS order Â· Exit before 3:20 PM IST</div>
+    </div>
+  </div>
+  <div class="alert-banner" style="background:#d4edda;color:#155724;border-color:#c3e6cb;">
+    âœ… How to trade: Place MIS BUY order at Entry price. Set bracket order with SL below and Target above.
+    Square off ALL positions before <b>3:20 PM IST</b>. F&O stocks can be held overnight.
+  </div>
+  <div class="section-title">ðŸŽ¯ Top BUY Picks â€” 2026-03-17</div>
+  <div class="grid-picks">
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#1</div>
+        <div class="pick-sym">AUROPHARMA</div>
+        <div class="pick-grade" style="background:#228B22;">A</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹1,352.93</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹1,407.92</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹1,224.60</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart15" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart15'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "AUROPHARMA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.0%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=62(bullzone) | RSI</div>
+      <div class="pick-timeframe">â± INTRADAY</div>
+    </div>
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#2</div>
+        <div class="pick-sym">COALINDIA</div>
+        <div class="pick-grade" style="background:#228B22;">A</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹486.99</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹507.00</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹440.29</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart16" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart16'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "COALINDIA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.3%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=63(bullzone) | RSI</div>
+      <div class="pick-timeframe">â± INTRADAY</div>
+    </div>
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#3</div>
+        <div class="pick-sym">SUNPHARMA</div>
+        <div class="pick-grade" style="background:#cc8800;">B</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹1,856.84</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹1,912.07</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹1,727.97</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart17" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart17'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "SUNPHARMA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.2%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=57(bullzone) | MAC</div>
+      <div class="pick-timeframe">â± INTRADAY</div>
+    </div></div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE 3: SELL/SHORT TODAY -->
+<div id="p3" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">â–¼ SHORT Picks â€” Today Intraday</div>
+      <div class="page-sub">Sell first â†’ Buy back lower same day Â· MIS SHORT order Â· Exit before 3:20 PM</div>
+    </div>
+  </div>
+  <div class="alert-banner" style="background:#f8d7da;color:#721c24;border-color:#f5c6cb;">
+    âš ï¸ SHORT ORDER: Sell â†’ wait for price to fall â†’ Buy back at T1. This is NOT a regular sell.
+    You need MIS SHORT or SELL (intraday) order type. F&O stocks only for overnight shorts via futures.
+    <b>Hard rule: Exit at SL â€” no hoping.</b>
+  </div>
+  <div class="section-title">ðŸŽ¯ Top SHORT Picks â€” 2026-03-17</div>
+  <div class="grid-picks">
+    <div class="pick-card sell-card">
+      <div class="pick-header">
+        <div class="pick-rank">#1</div>
+        <div class="pick-sym">INDIAMART</div>
+        <div class="pick-grade" style="background:#c62828;">B</div>
+        <div class="pick-score">64.8<span class="score-label">/100</span></div>
+        <div class="pick-dir sell-dir">â–¼ SHORT</div>
+        <div class="pick-layers">4/8</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">SHORT AT</span>
+            <span class="val">â‚¹2,096.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">COVER T1 <small>-4.3%</small></span>
+            <span class="val">â‚¹2,005.87</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">COVER T2</span>
+            <span class="val">â‚¹1,945.79</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">EXIT/SL <small>+2.3%</small></span>
+            <span class="val">â‚¹2,144.07</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">40</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart18" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart18'),{"type": "radar", "data": {"labels": ["GapFade", "RSI-OB", "VolClimax", "Breakdown", "WeakNifty", "DecayTop", "BearCandle", "PreMarket"], "datasets": [{"label": "INDIAMART", "data": [50.0, 40.0, 70.0, 100, 50.0, 70.0, 100, 43.0], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY SHORT:</b> UPPER-WICK-REJECTION | Below SMA20+SMA50 | SMA20<SMA50 downtrend | 3d-below-SMA20 | From52wH:-9% | BEAR-ENGULFING | BEAR</div>
+      <div class="pick-timeframe">â± INTRADAY (square off 3:20 PM)</div>
+    </div>
+    <div class="pick-card sell-card">
+      <div class="pick-header">
+        <div class="pick-rank">#2</div>
+        <div class="pick-sym">BAJAJFINSV</div>
+        <div class="pick-grade" style="background:#c62828;">B</div>
+        <div class="pick-score">62.5<span class="score-label">/100</span></div>
+        <div class="pick-dir sell-dir">â–¼ SHORT</div>
+        <div class="pick-layers">4/8<span class="fno-badge">F&O âœ“</span></div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">SHORT AT</span>
+            <span class="val">â‚¹1,770.10</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">COVER T1 <small>-4.2%</small></span>
+            <span class="val">â‚¹1,696.51</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">COVER T2</span>
+            <span class="val">â‚¹1,647.46</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">EXIT/SL <small>+2.2%</small></span>
+            <span class="val">â‚¹1,809.35</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#28a745;">29</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart19" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart19'),{"type": "radar", "data": {"labels": ["GapFade", "RSI-OB", "VolClimax", "Breakdown", "WeakNifty", "DecayTop", "BearCandle", "PreMarket"], "datasets": [{"label": "BAJAJFINSV", "data": [78.0, 40.0, 50.0, 80.0, 83.0, 70.0, 50.0, 43.0], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY SHORT:</b> Gap+2.2% | high-fill-history | Below SMA20+SMA50 | SMA20<SMA50 downtrend | Near 52W-low (risky short) | 3d-below-SMA20 |</div>
+      <div class="pick-timeframe">â± INTRADAY (square off 3:20 PM)</div>
+    </div>
+    <div class="pick-card sell-card">
+      <div class="pick-header">
+        <div class="pick-rank">#3</div>
+        <div class="pick-sym">GRASIM</div>
+        <div class="pick-grade" style="background:#c62828;">B</div>
+        <div class="pick-score">61.5<span class="score-label">/100</span></div>
+        <div class="pick-dir sell-dir">â–¼ SHORT</div>
+        <div class="pick-layers">3/8<span class="fno-badge">F&O âœ“</span></div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">SHORT AT</span>
+            <span class="val">â‚¹2,683.10</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">COVER T1 <small>-4.4%</small></span>
+            <span class="val">â‚¹2,564.47</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">COVER T2</span>
+            <span class="val">â‚¹2,485.39</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">EXIT/SL <small>+2.4%</small></span>
+            <span class="val">â‚¹2,746.37</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">43</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart20" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart20'),{"type": "radar", "data": {"labels": ["GapFade", "RSI-OB", "VolClimax", "Breakdown", "WeakNifty", "DecayTop", "BearCandle", "PreMarket"], "datasets": [{"label": "GRASIM", "data": [78.0, 40.0, 50.0, 100, 50.0, 70.0, 50.0, 43.0], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY SHORT:</b> Gap+3.4% | high-fill-history | Below SMA20+SMA50 | SMA20<SMA50 downtrend | 3d-below-SMA20 | From52wH:-10% | DXY+0.6%(FII</div>
+      <div class="pick-timeframe">â± INTRADAY (square off 3:20 PM)</div>
+    </div>
+    <div class="pick-card sell-card">
+      <div class="pick-header">
+        <div class="pick-rank">#4</div>
+        <div class="pick-sym">HAPPYFORGE</div>
+        <div class="pick-grade" style="background:#c62828;">B</div>
+        <div class="pick-score">61.2<span class="score-label">/100</span></div>
+        <div class="pick-dir sell-dir">â–¼ SHORT</div>
+        <div class="pick-layers">3/8</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">SHORT AT</span>
+            <span class="val">â‚¹1,282.40</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">COVER T1 <small>-6.5%</small></span>
+            <span class="val">â‚¹1,198.46</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">COVER T2</span>
+            <span class="val">â‚¹1,142.51</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">EXIT/SL <small>+3.5%</small></span>
+            <span class="val">â‚¹1,327.17</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">54</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart21" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart21'),{"type": "radar", "data": {"labels": ["GapFade", "RSI-OB", "VolClimax", "Breakdown", "WeakNifty", "DecayTop", "BearCandle", "PreMarket"], "datasets": [{"label": "HAPPYFORGE", "data": [90.0, 50.0, 50.0, 74.0, 50.0, 70.0, 50.0, 43.0], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY SHORT:</b> GAP-UP+6.5% (fill-rate:100%) | high-fill-history | Below SMA20 | 3d-below-SMA20 | From52wH:-6% | DXY+0.6%(FII-out)</div>
+      <div class="pick-timeframe">â± INTRADAY (square off 3:20 PM)</div>
+    </div>
+    <div class="pick-card sell-card">
+      <div class="pick-header">
+        <div class="pick-rank">#5</div>
+        <div class="pick-sym">ITI</div>
+        <div class="pick-grade" style="background:#c62828;">B</div>
+        <div class="pick-score">60.9<span class="score-label">/100</span></div>
+        <div class="pick-dir sell-dir">â–¼ SHORT</div>
+        <div class="pick-layers">3/8</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">SHORT AT</span>
+            <span class="val">â‚¹284.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">COVER T1 <small>-7.7%</small></span>
+            <span class="val">â‚¹262.23</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">COVER T2</span>
+            <span class="val">â‚¹247.71</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">EXIT/SL <small>+4.1%</small></span>
+            <span class="val">â‚¹295.61</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">56</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart22" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart22'),{"type": "radar", "data": {"labels": ["GapFade", "RSI-OB", "VolClimax", "Breakdown", "WeakNifty", "DecayTop", "BearCandle", "PreMarket"], "datasets": [{"label": "ITI", "data": [90.0, 50.0, 65.0, 68.0, 50.0, 50.0, 50.0, 43.0], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY SHORT:</b> GAP-UP+21.0% (fill-rate:100%) | high-fill-history | Vol-topping 88.2x | SMA20<SMA50 downtrend | DXY+0.6%(FII-out)</div>
+      <div class="pick-timeframe">â± INTRADAY (square off 3:20 PM)</div>
+    </div></div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE 4: TOMORROW PREDICTIONS -->
+<div id="p4" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">ðŸ“… Tomorrow's Predictions</div>
+      <div class="page-sub">Next-day swing signals Â· Entry today near close Â· Exit tomorrow Â· 1-2 day hold</div>
+    </div>
+  </div>
+  <div class="alert-banner" style="background:#fff3cd;color:#856404;border-color:#ffc107;">
+    ðŸ’¡ Tomorrow picks: Buy near today's close (3:00â€“3:20 PM). Target = sell tomorrow when T1 hits.
+    These have stronger conviction â€” based on multi-day momentum, not just today's move.
+  </div>
+  <div class="section-title">ðŸ“… Best Tomorrow Picks</div>
+  <div class="grid-picks">
+    
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#1</div>
+        <div class="pick-sym">AUROPHARMA</div>
+        <div class="pick-grade" style="background:#228B22;">A</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹1,352.93</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹1,407.92</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹1,224.60</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart52" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart52'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "AUROPHARMA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.0%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=62(bullzone) | RSI</div>
+      <div class="pick-timeframe">â± 1-2 DAY HOLD</div>
+    </div>
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#2</div>
+        <div class="pick-sym">COALINDIA</div>
+        <div class="pick-grade" style="background:#228B22;">A</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹486.99</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹507.00</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹440.29</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart53" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart53'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "COALINDIA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.3%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=63(bullzone) | RSI</div>
+      <div class="pick-timeframe">â± 1-2 DAY HOLD</div>
+    </div>
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#3</div>
+        <div class="pick-sym">SUNPHARMA</div>
+        <div class="pick-grade" style="background:#cc8800;">B</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹1,856.84</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹1,912.07</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹1,727.97</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart54" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart54'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "SUNPHARMA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.2%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=57(bullzone) | MAC</div>
+      <div class="pick-timeframe">â± 1-2 DAY HOLD</div>
+    </div>
+    
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE 5: WEEK SWING -->
+<div id="p5" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">ðŸ“Š Week Swing Picks (3-5 Days)</div>
+      <div class="page-sub">CNXMIDCAP + Blue chips Â· Wider targets Â· CNC delivery orders</div>
+    </div>
+  </div>
+  <div class="alert-banner" style="background:#e8f4fd;color:#0c5460;border-color:#bee5eb;">
+    ðŸ“Š Swing picks: Use CNC (delivery) order. Hold 3-5 trading days. Wider SL to avoid shakeout.
+    Stop if Nifty falls >2% in a single day â€” that overrides all swing setups.
+  </div>
+  <div class="section-title">ðŸ“… 3-5 Day Swing Setups</div>
+  <div class="grid-picks">
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#1</div>
+        <div class="pick-sym">AUROPHARMA</div>
+        <div class="pick-grade" style="background:#228B22;">A</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹1,352.93</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹1,407.92</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹1,224.60</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart23" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart23'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "AUROPHARMA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.0%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=62(bullzone) | RSI</div>
+      <div class="pick-timeframe">â± 3-5 DAY SWING</div>
+    </div>
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#2</div>
+        <div class="pick-sym">COALINDIA</div>
+        <div class="pick-grade" style="background:#228B22;">A</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹486.99</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹507.00</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹440.29</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart24" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart24'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "COALINDIA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.3%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=63(bullzone) | RSI</div>
+      <div class="pick-timeframe">â± 3-5 DAY SWING</div>
+    </div>
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#3</div>
+        <div class="pick-sym">SUNPHARMA</div>
+        <div class="pick-grade" style="background:#cc8800;">B</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹1,856.84</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹1,912.07</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹1,727.97</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart25" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart25'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "SUNPHARMA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.2%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=57(bullzone) | MAC</div>
+      <div class="pick-timeframe">â± 3-5 DAY SWING</div>
+    </div></div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE 6: MONTHLY -->
+<div id="p6" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">ðŸ“† Monthly Positional Picks (1 Month)</div>
+      <div class="page-sub">1-month holding Â· 10-22% targets Â· CNC/Futures Â· Smaller position size</div>
+    </div>
+  </div>
+  <div class="alert-banner" style="background:#e8f5e9;color:#1b5e20;border-color:#c8e6c9;">
+    ðŸ“† Positional picks: Buy in 2-3 tranches (don't put all capital at once). SL is -6% from entry.
+    These are based on 52W breakouts, accumulation patterns, and strong sector tailwinds.
+  </div>
+  <div class="section-title">ðŸ“† 1-Month Positional Setups â€” Target 10-22%</div>
+  <div class="grid-picks">
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#1</div>
+        <div class="pick-sym">AUROPHARMA</div>
+        <div class="pick-grade" style="background:#228B22;">A</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹1,352.93</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹1,407.92</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹1,224.60</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart26" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart26'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "AUROPHARMA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.0%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=62(bullzone) | RSI</div>
+      <div class="pick-timeframe">â± 1-MONTH POSITIONAL</div>
+    </div>
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#2</div>
+        <div class="pick-sym">COALINDIA</div>
+        <div class="pick-grade" style="background:#228B22;">A</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹486.99</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹507.00</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹440.29</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart27" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart27'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "COALINDIA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.3%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=63(bullzone) | RSI</div>
+      <div class="pick-timeframe">â± 1-MONTH POSITIONAL</div>
+    </div>
+    <div class="pick-card buy-card">
+      <div class="pick-header">
+        <div class="pick-rank">#3</div>
+        <div class="pick-sym">SUNPHARMA</div>
+        <div class="pick-grade" style="background:#cc8800;">B</div>
+        <div class="pick-score">0.0<span class="score-label">/100</span></div>
+        <div class="pick-dir buy-dir">â–² BUY</div>
+        <div class="pick-layers">5/8 layers</div>
+      </div>
+      <div class="pick-body">
+        <div class="pick-levels">
+          <div class="level-row entry-row">
+            <span class="lbl">ENTRY</span>
+            <span class="val">â‚¹0.00</span>
+          </div>
+          <div class="level-row t1-row">
+            <span class="lbl">TARGET 1 <small>+0.0%</small></span>
+            <span class="val">â‚¹1,856.84</span>
+          </div>
+          <div class="level-row t2-row">
+            <span class="lbl">TARGET 2</span>
+            <span class="val">â‚¹1,912.07</span>
+          </div>
+          <div class="level-row sl-row">
+            <span class="lbl">STOP LOSS <small>-0.0%</small></span>
+            <span class="val">â‚¹1,727.97</span>
+          </div>
+          <div class="level-row">
+            <span class="lbl">RSI-14</span>
+            <span class="val rsi-val" style="color:#333;">50</span>
+          </div>
+        </div>
+        <div class="pick-radar">
+          <canvas id="chart28" height="160"></canvas>
+          <script>new Chart(document.getElementById('chart28'),{"type": "radar", "data": {"labels": ["L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8"], "datasets": [{"label": "SUNPHARMA", "data": [50, 50, 50, 50, 50, 50, 50, 50], "backgroundColor": "rgba(33,150,243,0.2)", "borderColor": "#2196F3", "pointBackgroundColor": "#2196F3", "borderWidth": 2}]}, "options": {"responsive": true, "maintainAspectRatio": false, "scales": {"r": {"min": 0, "max": 100, "ticks": {"font": {"size": 9}}, "pointLabels": {"font": {"size": 10}}}}, "plugins": {"legend": {"display": false}}}});</script>
+        </div>
+      </div>
+      <div class="pick-reasons"><b>WHY:</b> Close to 52W-high(-3.2%) | Above 50d-support | Above SMA20 | SMA20>SMA50 uptrend | OBV rising | RSI14=57(bullzone) | MAC</div>
+      <div class="pick-timeframe">â± 1-MONTH POSITIONAL</div>
+    </div></div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE 7: SECTORS -->
+<div id="p7" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">ðŸ­ Sector Heatmap</div>
+      <div class="page-sub">All 12 NSE sectors Â· Today's momentum Â· Relative strength Â· Rotation signals</div>
+    </div>
+  </div>
+  <div class="section-title">ðŸ­ All Sector Performance Today</div>
+  <div class="grid-sectors">
+    <div class="sector-card" style="border-left:4px solid #1565C0;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸ¦</span>
+        <span class="sec-name">Banking & Finance</span>
+        <span class="sec-trend" style="background:#fff3cd;color:#856404;">NEUTRAL</span>
+      </div>
+      <div class="sec-avg" style="color:#28a745;">
+        +0.78% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">HDFCBANK</span>
+          <span class="sec-p" style="color:#28a745;">+0.6%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">ICICIBANK</span>
+          <span class="sec-p" style="color:#28a745;">+1.2%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">SBIN</span>
+          <span class="sec-p" style="color:#dc3545;">-0.2%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">KOTAKBANK</span>
+          <span class="sec-p" style="color:#28a745;">+1.2%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart29" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart29'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [925.7, 924.7, 915.6, 911.85, 923.6, 910.5, 907.6, 898.6, 887.75, 879.4, 868.65, 877.75, 857.05, 840.7, 849.45, 833.95, 832.75, 817.0, 840.6, 845.35], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #00695C;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸ’»</span>
+        <span class="sec-name">IT & Technology</span>
+        <span class="sec-trend" style="background:#fff3cd;color:#856404;">NEUTRAL</span>
+      </div>
+      <div class="sec-avg" style="color:#dc3545;">
+        -0.88% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">TCS</span>
+          <span class="sec-p" style="color:#dc3545;">-0.7%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">INFY</span>
+          <span class="sec-p" style="color:#dc3545;">-1.4%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">HCLTECH</span>
+          <span class="sec-p" style="color:#dc3545;">-0.6%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">WIPRO</span>
+          <span class="sec-p" style="color:#dc3545;">-1.9%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart30" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart30'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [2717.4, 2694.9, 2677.9, 2686.2, 2676.3, 2573.7, 2629.3, 2647.7, 2637.4, 2613.5, 2587.8, 2578.8, 2557.6, 2527.4, 2513.1, 2464.9, 2442.4, 2410.5, 2409.2, 2391.7], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #6A1B9A;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸ’Š</span>
+        <span class="sec-name">Pharma & Healthcare</span>
+        <span class="sec-trend" style="background:#fff3cd;color:#856404;">NEUTRAL</span>
+      </div>
+      <div class="sec-avg" style="color:#28a745;">
+        +0.05% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">SUNPHARMA</span>
+          <span class="sec-p" style="color:#28a745;">+0.6%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">DRREDDY</span>
+          <span class="sec-p" style="color:#28a745;">+0.5%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">CIPLA</span>
+          <span class="sec-p" style="color:#dc3545;">-1.4%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">DIVISLAB</span>
+          <span class="sec-p" style="color:#28a745;">+0.3%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart31" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart31'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [1717.1, 1724.4, 1713.4, 1724.4, 1732.3, 1731.8, 1764.2, 1785.7, 1737.0, 1752.5, 1750.5, 1784.5, 1799.4, 1807.4, 1812.8, 1825.9, 1825.3, 1801.6, 1783.2, 1794.4], "borderColor": "#28a745", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(40,167,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #E65100;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸš—</span>
+        <span class="sec-name">Auto & EV</span>
+        <span class="sec-trend" style="background:#d4edda;color:#155724;">BULLISH</span>
+      </div>
+      <div class="sec-avg" style="color:#28a745;">
+        +1.65% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">MARUTI</span>
+          <span class="sec-p" style="color:#28a745;">+1.7%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">M&M</span>
+          <span class="sec-p" style="color:#28a745;">+3.1%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">BAJAJ-AUTO</span>
+          <span class="sec-p" style="color:#28a745;">+0.4%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">HEROMOTOCO</span>
+          <span class="sec-p" style="color:#28a745;">+1.4%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart32" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart32'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [15179.0, 15164.0, 14903.0, 14977.0, 15072.0, 14926.0, 15070.0, 15213.0, 14857.0, 14388.0, 14158.0, 14415.0, 14159.0, 13508.0, 13867.0, 13497.0, 13011.0, 12591.0, 12757.0, 12972.0], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #BF360C;">
+      <div class="sec-header">
+        <span class="sec-icon">âš¡</span>
+        <span class="sec-name">Energy & Oil</span>
+        <span class="sec-trend" style="background:#fff3cd;color:#856404;">NEUTRAL</span>
+      </div>
+      <div class="sec-avg" style="color:#dc3545;">
+        -0.04% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">RELIANCE</span>
+          <span class="sec-p" style="color:#28a745;">+0.2%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">ONGC</span>
+          <span class="sec-p" style="color:#28a745;">+1.6%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">BPCL</span>
+          <span class="sec-p" style="color:#dc3545;">-1.6%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">IOC</span>
+          <span class="sec-p" style="color:#dc3545;">-1.5%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart33" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart33'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [1423.0, 1441.3, 1409.5, 1419.4, 1428.0, 1428.8, 1398.5, 1406.8, 1393.9, 1358.0, 1345.0, 1389.4, 1404.8, 1424.0, 1408.8, 1390.2, 1392.2, 1380.7, 1395.1, 1397.6], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #4E342E;">
+      <div class="sec-header">
+        <span class="sec-icon">â›ï¸</span>
+        <span class="sec-name">Metals & Mining</span>
+        <span class="sec-trend" style="background:#d4edda;color:#155724;">BULLISH</span>
+      </div>
+      <div class="sec-avg" style="color:#28a745;">
+        +2.45% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">TATASTEEL</span>
+          <span class="sec-p" style="color:#28a745;">+4.5%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">JSWSTEEL</span>
+          <span class="sec-p" style="color:#28a745;">+1.9%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">HINDALCO</span>
+          <span class="sec-p" style="color:#28a745;">+1.7%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">VEDL</span>
+          <span class="sec-p" style="color:#28a745;">+2.0%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart34" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart34'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [203.08, 209.03, 205.41, 208.36, 208.14, 209.13, 214.64, 215.52, 212.33, 211.01, 196.73, 200.57, 198.46, 191.01, 195.0, 194.74, 193.47, 183.51, 186.94, 195.43], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #1B5E20;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸ§´</span>
+        <span class="sec-name">FMCG & Consumer</span>
+        <span class="sec-trend" style="background:#fff3cd;color:#856404;">NEUTRAL</span>
+      </div>
+      <div class="sec-avg" style="color:#dc3545;">
+        -0.71% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">HINDUNILVR</span>
+          <span class="sec-p" style="color:#dc3545;">-0.8%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">ITC</span>
+          <span class="sec-p" style="color:#dc3545;">-1.1%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">NESTLEIND</span>
+          <span class="sec-p" style="color:#dc3545;">-0.5%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">BRITANNIA</span>
+          <span class="sec-p" style="color:#28a745;">+0.3%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart35" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart35'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [2312.3, 2323.5, 2279.3, 2314.5, 2345.4, 2358.6, 2374.9, 2383.3, 2338.1, 2320.6, 2261.3, 2255.0, 2225.7, 2194.6, 2190.2, 2161.4, 2136.9, 2160.0, 2175.7, 2158.2], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #880E4F;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸ—ï¸</span>
+        <span class="sec-name">Real Estate</span>
+        <span class="sec-trend" style="background:#d4edda;color:#155724;">BULLISH</span>
+      </div>
+      <div class="sec-avg" style="color:#28a745;">
+        +1.74% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">DLF</span>
+          <span class="sec-p" style="color:#28a745;">+3.3%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">GODREJPROP</span>
+          <span class="sec-p" style="color:#28a745;">+1.6%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">OBEROIRLTY</span>
+          <span class="sec-p" style="color:#28a745;">+2.8%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">PRESTIGE</span>
+          <span class="sec-p" style="color:#28a745;">+1.2%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart36" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart36'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [639.05, 642.45, 620.5, 629.3, 626.3, 611.65, 611.2, 610.8, 603.85, 590.2, 569.05, 585.15, 577.55, 574.95, 584.55, 573.2, 558.1, 542.75, 530.35, 547.8], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #33691E;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸ­</span>
+        <span class="sec-name">Infra & Capital Goods</span>
+        <span class="sec-trend" style="background:#d4edda;color:#155724;">BULLISH</span>
+      </div>
+      <div class="sec-avg" style="color:#28a745;">
+        +1.35% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">LT</span>
+          <span class="sec-p" style="color:#28a745;">+2.1%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">ABB</span>
+          <span class="sec-p" style="color:#28a745;">+1.5%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">SIEMENS</span>
+          <span class="sec-p" style="color:#28a745;">+0.8%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">BHEL</span>
+          <span class="sec-p" style="color:#28a745;">+1.1%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart37" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart37'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [4279.8, 4325.9, 4280.5, 4380.6, 4418.1, 4259.2, 4298.5, 4286.5, 4278.3, 4066.7, 3882.6, 4038.7, 3949.8, 3842.1, 3876.0, 3838.8, 3719.5, 3439.0, 3469.4, 3542.8], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #1A237E;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸ›¡ï¸</span>
+        <span class="sec-name">Defence & PSU</span>
+        <span class="sec-trend" style="background:#d4edda;color:#155724;">BULLISH</span>
+      </div>
+      <div class="sec-avg" style="color:#28a745;">
+        +2.27% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">HAL</span>
+          <span class="sec-p" style="color:#28a745;">+1.3%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">BEL</span>
+          <span class="sec-p" style="color:#28a745;">+2.3%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">BHEL</span>
+          <span class="sec-p" style="color:#28a745;">+1.1%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">COCHINSHIP</span>
+          <span class="sec-p" style="color:#28a745;">+1.9%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart38" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart38'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [4212.6, 4251.1, 4132.6, 4170.0, 4025.4, 3952.6, 3985.0, 4008.9, 3913.2, 3951.6, 3876.8, 3891.8, 4023.7, 3989.9, 4040.1, 4005.1, 4013.5, 3914.4, 3913.1, 3963.1], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #006064;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸ§ª</span>
+        <span class="sec-name">Chemicals & Specialty</span>
+        <span class="sec-trend" style="background:#d4edda;color:#155724;">BULLISH</span>
+      </div>
+      <div class="sec-avg" style="color:#28a745;">
+        +1.06% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">PIDILITIND</span>
+          <span class="sec-p" style="color:#28a745;">+0.2%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">DEEPAKNTR</span>
+          <span class="sec-p" style="color:#28a745;">+0.2%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">NAVINFLUOR</span>
+          <span class="sec-p" style="color:#28a745;">+1.8%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">SRF</span>
+          <span class="sec-p" style="color:#28a745;">+2.0%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart39" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart39'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [1495.5, 1489.5, 1464.9, 1464.9, 1481.0, 1480.5, 1497.6, 1516.9, 1492.0, 1465.5, 1439.1, 1445.9, 1433.8, 1386.4, 1427.7, 1403.4, 1387.4, 1340.0, 1353.6, 1357.0], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div>
+    <div class="sector-card" style="border-left:4px solid #4A148C;">
+      <div class="sec-header">
+        <span class="sec-icon">ðŸ›ï¸</span>
+        <span class="sec-name">Consumer Discretionary</span>
+        <span class="sec-trend" style="background:#fff3cd;color:#856404;">NEUTRAL</span>
+      </div>
+      <div class="sec-avg" style="color:#28a745;">
+        +0.19% today
+      </div>
+      <div class="sec-stocks">
+        <div class="sec-stock">
+          <span class="sec-sym">TITAN</span>
+          <span class="sec-p" style="color:#dc3545;">-0.0%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">TRENT</span>
+          <span class="sec-p" style="color:#28a745;">+1.1%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">DMART</span>
+          <span class="sec-p" style="color:#dc3545;">-1.0%</span>
+        </div>
+        <div class="sec-stock">
+          <span class="sec-sym">NYKAA</span>
+          <span class="sec-p" style="color:#28a745;">+1.3%</span>
+        </div></div>
+      <div class="sec-spark"><canvas id="chart40" height="35"></canvas></div>
+      <script>try{new Chart(document.getElementById('chart40'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "datasets": [{"data": [4236.4, 4248.6, 4198.2, 4236.4, 4272.7, 4294.5, 4325.0, 4342.6, 4327.5, 4270.3, 4204.4, 4275.2, 4244.6, 4159.2, 4220.1, 4140.3, 4129.6, 4073.2, 4090.8, 4090.5], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});}catch(e){}</script>
+    </div></div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE 8: HISTORY -->
+<div id="p8" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">ðŸ“š Prediction History & Win Rate Stats</div>
+      <div class="page-sub">All predictions stored in SQLite DB Â· Layer accuracy Â· Daily P&L</div>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-val">0%</div>
+      <div class="stat-lbl">BUY Win Rate</div>
+      <div class="stat-sub">0W / 0L</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">0</div>
+      <div class="stat-lbl">Total BUY Picks (DB)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">0%</div>
+      <div class="stat-lbl">SHORT Win Rate</div>
+      <div class="stat-sub">0W / 0L</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:#28a745;">
+        â‚¹+0
+      </div>
+      <div class="stat-lbl">Gross P&L (Shorts)</div>
+    </div>
+  </div>
+
+  <div class="grid-2col">
+    <!-- DATE HISTORY -->
+    <div>
+      <div class="section-title">ðŸ“… Recent Prediction Dates</div>
+      <div style="background:#1a1f2e;border-radius:10px;overflow:hidden;border:1px solid #2a2f3f;">
+        <table class="data-table">
+          <thead><tr>
+            <th>Date</th><th>Picks</th><th>Wins</th><th>Losses</th><th>Win Rate</th>
+          </tr></thead>
+          <tbody>
+            <tr><td colspan="5" style="text-align:center;color:#888;padding:20px;">No history yet. Run grand_master.py and daily_audit.py first.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- LAYER ACCURACY -->
+    <div>
+      <div class="section-title">ðŸ§¬ Signal Layer Accuracy</div>
+      <div style="background:#1a1f2e;border-radius:10px;overflow:hidden;border:1px solid #2a2f3f;">
+        <table class="data-table">
+          <thead><tr>
+            <th>Layer</th><th>Wins</th><th>Losses</th><th>Win Rate</th>
+          </tr></thead>
+          <tbody>
+            <tr><td colspan="4" style="text-align:center;color:#888;padding:20px;">Run daily_audit.py to populate layer stats.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PAGE 9: GLOBAL -->
+<div id="p9" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">ðŸŒ Global Markets & Commodities</div>
+      <div class="page-sub">US + Asia + Europe Â· Crude Â· Gold Â· Currencies Â· Bond yields</div>
+    </div>
+  </div>
+
+  <div class="section-title">ðŸ“Š US & Asian Markets</div>
+  <div class="grid-macros">
+    
+    <div class="macro-card">
+      <div class="macro-name">S&P 500</div>
+      <div class="macro-price" style="color:#155724;">6,734.46</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.52%
+      </div>
+      <div class="spark-wrap"><canvas id="chart55" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart55'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [6775.8, 6672.62, 6632.19, 6699.38, 6734.46], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Nasdaq</div>
+      <div class="macro-price" style="color:#155724;">22,508.88</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.60%
+      </div>
+      <div class="spark-wrap"><canvas id="chart56" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart56'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [22716.13, 22311.98, 22105.36, 22374.18, 22508.88], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Dow Jones</div>
+      <div class="macro-price" style="color:#155724;">47,108.24</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.34%
+      </div>
+      <div class="spark-wrap"><canvas id="chart57" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart57'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [47417.27, 46677.85, 46558.47, 46946.41, 47108.24], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">US VIX</div>
+      <div class="macro-price" style="color:#721c24;">22.40</div>
+      <div class="macro-chg" style="background:#f8d7da;color:#721c24;">
+        â–¼ -4.72%
+      </div>
+      <div class="spark-wrap"><canvas id="chart58" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart58'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [24.23, 27.29, 27.19, 23.51, 22.4], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Hang Seng</div>
+      <div class="macro-price" style="color:#155724;">25,868.54</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.13%
+      </div>
+      <div class="spark-wrap"><canvas id="chart59" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart59'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [25898.76, 25716.76, 25465.6, 25834.02, 25868.54], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+  </div>
+
+  <div class="section-title">ðŸ›¢ï¸ Commodities</div>
+  <div class="grid-macros">
+    
+    <div class="macro-card">
+      <div class="macro-name">Crude Oil</div>
+      <div class="macro-price" style="color:#155724;">94.20</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.75%
+      </div>
+      <div class="spark-wrap"><canvas id="chart60" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart60'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [95.73, 98.71, 93.5, 94.2], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Gold</div>
+      <div class="macro-price" style="color:#155724;">5,014.30</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.41%
+      </div>
+      <div class="spark-wrap"><canvas id="chart61" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart61'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [5115.8, 5052.5, 4994.0, 5014.3], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Silver</div>
+      <div class="macro-price" style="color:#155724;">80.81</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.68%
+      </div>
+      <div class="spark-wrap"><canvas id="chart62" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart62'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [84.67, 80.91, 80.26, 80.81], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Natural Gas</div>
+      <div class="macro-price" style="color:#155724;">3.07</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +1.59%
+      </div>
+      <div class="spark-wrap"><canvas id="chart63" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart63'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [3.23, 3.13, 3.02, 3.07], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+  </div>
+
+  <div class="section-title">ðŸ’± Currencies & Bonds</div>
+  <div class="grid-macros">
+    
+    <div class="macro-card">
+      <div class="macro-name">USD/INR</div>
+      <div class="macro-price" style="color:#721c24;">92.38</div>
+      <div class="macro-chg" style="background:#f8d7da;color:#721c24;">
+        â–¼ -0.20%
+      </div>
+      <div class="spark-wrap"><canvas id="chart64" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart64'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [92.17, 92.23, 92.39, 92.56, 92.38], "borderColor": "#28a745", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(40,167,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">DXY Index</div>
+      <div class="macro-price" style="color:#155724;">100.36</div>
+      <div class="macro-chg" style="background:#d4edda;color:#155724;">
+        â–² +0.62%
+      </div>
+      <div class="spark-wrap"><canvas id="chart65" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart65'),{"type": "line", "data": {"labels": [0, 1, 2, 3], "datasets": [{"data": [98.83, 99.23, 99.74, 100.36], "borderColor": "#28a745", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(40,167,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">US 10Y Yield</div>
+      <div class="macro-price" style="color:#721c24;">4.20</div>
+      <div class="macro-chg" style="background:#f8d7da;color:#721c24;">
+        â–¼ -0.52%
+      </div>
+      <div class="spark-wrap"><canvas id="chart66" height="40"></canvas></div>
+      <script>new Chart(document.getElementById('chart66'),{"type": "line", "data": {"labels": [0, 1, 2, 3, 4], "datasets": [{"data": [4.21, 4.27, 4.28, 4.22, 4.2], "borderColor": "#dc3545", "borderWidth": 2, "fill": true, "backgroundColor": "rgba(220,53,69,0.1)", "pointRadius": 0, "tension": 0.4}]}, "options": {"responsive": true, "maintainAspectRatio": false, "plugins": {"legend": {"display": false}}, "scales": {"x": {"display": false}, "y": {"display": false}}, "elements": {"line": {"borderWidth": 1.5}}}});</script>
+    </div>
+  </div>
+
+  <div class="section-title">ðŸ“– Global â†’ India Impact Guide</div>
+  <div style="background:#1a1f2e;border-radius:10px;border:1px solid #2a2f3f;overflow:hidden;">
+    <table class="data-table">
+      <thead><tr><th>Signal</th><th>Current</th><th>Impact on NSE</th><th>Affected Sectors</th></tr></thead>
+      <tbody>
+        <tr><td>Crude Oil +0.8%</td>
+            <td>ðŸŸ¡ FLAT</td>
+            <td>Positive â€” cost relief</td>
+            <td>Airlines, Paints, FMCG, Tyres, ONGC+</td></tr>
+        <tr><td>USD/INR -0.20%</td>
+            <td>ðŸŸ¡ Stable</td>
+            <td>Importers benefit; IT headwind</td>
+            <td>IT, Pharma (exporters); OMCs, Gold</td></tr>
+        <tr><td>US VIX -4.7%</td>
+            <td>ðŸ”´ Fear spike</td>
+            <td>FII selling India â€” broad market fall</td>
+            <td>All sectors (macro fear)</td></tr>
+        <tr><td>US 10Y Yield 4.20%</td>
+            <td>ðŸŸ¢ Manageable</td>
+            <td>Lower yield = FII stays in India</td>
+            <td>Banking, IT, Rate-sensitives</td></tr>
+        <tr><td>Gold +0.4%</td>
+            <td>ðŸŸ¢ Calm</td>
+            <td>Neutral</td>
+            <td>Metal stocks, Titan, Sentiment</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="risk-warning">
+  âš ï¸ <b>RISK DISCLAIMER:</b> This dashboard is for informational and educational purposes only.
+  All stock picks are algorithmic signals â€” NOT financial advice. Stock markets carry risk of capital loss.
+  Past performance does not guarantee future results. Always use stop-losses. Intraday trades must be squared off before 3:20 PM IST.
+  Not SEBI registered. Trade at your own risk.
+</div>
+
+<div class="footer">
+  NSE Stock Intelligence Dashboard &mdash; Generated 17 Mar 2026  20:08 IST &mdash;
+  Data powered by Yahoo Finance &mdash; Capital: â‚¹1,00,000 &mdash;
+  <br>Share this HTML file via WhatsApp or email â€” opens in any browser, no login needed.
+</div>
+
+<script>
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+// Keyboard shortcut: press 1-9 to switch pages
+document.addEventListener('keydown', function(e) {
+  const n = parseInt(e.key);
+  if (n >= 1 && n <= 9) {
+    const btns = document.querySelectorAll('.nav-btn');
+    if (btns[n-1]) btns[n-1].click();
+  }
+});
+</script>
+</body>
+</html>

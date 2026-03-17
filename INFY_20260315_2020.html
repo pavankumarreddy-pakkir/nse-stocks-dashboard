@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>INFY — Deep Stock Analysis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; font-size: 14px; padding: 20px; }
+  h1 { font-size: 24px; color: #58a6ff; margin-bottom: 4px; }
+  h2 { font-size: 16px; color: #8b949e; font-weight: 400; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 20px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+  .card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #58a6ff; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; }
+  td, th { padding: 5px 8px; border-bottom: 1px solid #21262d; }
+  th { color: #8b949e; font-weight: 500; text-align: left; font-size: 12px; }
+  tr:last-child td { border-bottom: none; }
+  .score-box { text-align:center; padding: 20px; }
+  .score-num { font-size: 56px; font-weight: 700; color: #ff5252; }
+  .grade { font-size: 28px; color: #ff5252; }
+  .signal { font-size: 20px; font-weight: 600; color: #ff5252; margin-top: 8px; }
+  .price-big { font-size: 36px; font-weight: 700; }
+  .tag { display:inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  .meta { color: #8b949e; font-size: 12px; margin-top: 4px; }
+  footer { text-align:center; padding: 20px 0; color: #8b949e; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Infosys Limited  <span style="color:#8b949e;font-size:16px">(INFY.NS)</span></h1>
+<h2>Technology  ·  Generated: 2026-03-15 20:20</h2>
+
+<div class="grid">
+
+  <!-- PRICE & VERDICT -->
+  <div class="card">
+    <h3>Price & Verdict</h3>
+    <div class="score-box">
+      <div class="price-big">₹1,248.30</div>
+      <div class="meta">-1.38% today</div>
+      <div style="margin-top:16px" class="score-num">44</div>
+      <div class="meta">/ 100 conviction score</div>
+      <div class="grade">Grade: D</div>
+      <div class="signal">SELL</div>
+    </div>
+  </div>
+
+  <!-- RETURNS -->
+  <div class="card">
+    <h3>Returns</h3>
+    <table>
+      <tr><th>Period</th><th>Return</th></tr>
+      <tr><td>1 Day</td><td style="color:#ff5252">-1.38%</td></tr>
+      <tr><td>1 Week</td><td style="color:#ff5252">-5.07%</td></tr>
+      <tr><td>1 Month</td><td style="color:#ff5252">-8.82%</td></tr>
+      <tr><td>3 Months</td><td style="color:#ff5252">-22.08%</td></tr>
+      <tr><td>1 Year</td><td style="color:#ff5252">-23.77%</td></tr>
+      <tr><td>Distance from 52W High</td><td style="color:#ff5252">-26.13%</td></tr>
+      <tr><td>Distance from 52W Low</td><td style="color:#00e676">+0.00%</td></tr>
+    </table>
+  </div>
+
+  <!-- TECHNICALS -->
+  <div class="card">
+    <h3>Technical Indicators</h3>
+    <table>
+      <tr><th>Indicator</th><th>Value</th></tr>
+      <tr><td>Trend</td><td style="color:#ff5252">BEARISH</td></tr>
+      <tr><td>RSI(14)</td><td>25.2</td></tr>
+      <tr><td>MACD</td><td>-62.062  /  Signal: -66.260</td></tr>
+      <tr><td>MACD Histogram</td><td style="color:#00e676">4.198</td></tr>
+      <tr><td>ADX(14)</td><td>45.6</td></tr>
+      <tr><td>+DI / -DI</td><td><span style="color:#00e676">15.2</span> / <span style="color:#ff5252">32.9</span></td></tr>
+      <tr><td>SMA20 / SMA50 / SMA200</td><td>₹1,315.9 / ₹1,488.7 / ₹1,514.5</td></tr>
+      <tr><td>Bollinger %B</td><td>8.9%</td></tr>
+      <tr><td>Volume Ratio (vs 20d avg)</td><td style="color:#ff5252">0.47x</td></tr>
+      <tr><td>OBV Trend</td><td style="color:#ff5252">FALLING</td></tr>
+    </table>
+  </div>
+
+  <!-- SUPPORT & RESISTANCE -->
+  <div class="card">
+    <h3>Support &amp; Resistance</h3>
+    <table>
+      <tr><th>Level</th><th>Price</th><th>Gap</th></tr>
+      <tr style="color:#ff5252"><td>Resistance R1</td><td>₹1,689.80</td><td>+35.4%</td></tr><tr style="color:#ff5252"><td>Resistance R2</td><td>₹1,689.60</td><td>+35.4%</td></tr><tr style="color:#ff5252"><td>Resistance R3</td><td>₹1,682.70</td><td>+34.8%</td></tr><tr style="color:#64b5f6;font-weight:bold"><td>► CURRENT</td><td>₹1,248.30</td><td>—</td></tr><tr style="color:#00e676"><td>Support S1</td><td>₹1,275.50</td><td>2.2%</td></tr><tr style="color:#00e676"><td>Support S2</td><td>₹1,288.90</td><td>3.3%</td></tr><tr style="color:#00e676"><td>Support S3</td><td>₹1,365.60</td><td>9.4%</td></tr>
+    </table>
+  </div>
+
+  <!-- ENTRY / EXIT -->
+  <div class="card">
+    <h3>Entry / Exit Zones</h3>
+    <table>
+      <tr><th></th><th></th></tr>
+      <tr><td>Entry Zone</td><td>₹1,185.89 → ₹1,254.54</td></tr>
+      <tr><td style="color:#ff5252">Stop Loss</td><td style="color:#ff5252">₹1,156.24  (risk 7.8%)</td></tr>
+      <tr><td style="color:#00e676">Target 1</td><td style="color:#00e676">₹1,682.70  (R:R = 4.36)</td></tr>
+      <tr><td style="color:#00e676">Target 2</td><td style="color:#00e676">₹1,333.62  (R:R = 0.8)</td></tr>
+      <tr><td style="color:#00e676">Target 3</td><td style="color:#00e676">₹1,723.60  (near 52W high)</td></tr>
+      <tr><td>ATR(14)</td><td>₹34.13</td></tr>
+      <tr><td>Setup Quality</td><td style="color:#00e676">GOOD SETUP</td></tr>
+    </table>
+  </div>
+
+  <!-- FUNDAMENTALS -->
+  <div class="card">
+    <h3>Fundamentals</h3>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Trailing P/E</td><td>17.48</td></tr>
+      <tr><td>Forward P/E</td><td>16.36</td></tr>
+      <tr><td>Price/Book</td><td>5.91</td></tr>
+      <tr><td>EPS (TTM)</td><td>71.40 ₹</td></tr>
+      <tr><td>ROE</td><td>32.68%</td></tr>
+      <tr><td>ROA</td><td>15.67%</td></tr>
+      <tr><td>Revenue Growth</td><td>3.20%</td></tr>
+      <tr><td>Earnings Growth</td><td>-5.30%</td></tr>
+      <tr><td>Debt/Equity</td><td>10.53</td></tr>
+      <tr><td>Dividend Yield</td><td>360.00%</td></tr>
+    </table>
+  </div>
+
+  <!-- NEWS SENTIMENT -->
+  <div class="card" style="grid-column: span 2">
+    <h3>News Sentiment — <span style="color:#ffeb3b">NEUTRAL</span></h3>
+    <table>
+      <tr><th>Sentiment</th><th>Headline</th></tr>
+      <tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr><tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr><tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr><tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr><tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr><tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr><tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr><tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr>
+    </table>
+  </div>
+
+  <!-- SECTOR PEER COMPARISON -->
+  <div class="card" style="grid-column: span 2">
+    <h3>Sector Peer Comparison — Technology</h3>
+    <table>
+      <tr><th>Symbol</th><th>Price</th><th>1M Return</th><th>3M Return</th><th>P/E</th><th>P/B</th></tr>
+      <tr><td>TCS</td><td>₹2,410.50</td><td style="color:#ff5252">-10.46%</td><td style="color:#ff5252">-24.02%</td><td>18.3</td><td>7.7</td></tr><tr><td>WIPRO</td><td>₹197.58</td><td style="color:#ff5252">-7.71%</td><td style="color:#ff5252">-22.56%</td><td>15.6</td><td>2.3</td></tr><tr><td>HCLTECH</td><td>₹1,325.40</td><td style="color:#ff5252">-8.92%</td><td style="color:#ff5252">-20.72%</td><td>21.8</td><td>4.8</td></tr><tr><td>TECHM</td><td>₹1,332.80</td><td style="color:#ff5252">-13.14%</td><td style="color:#ff5252">-15.40%</td><td>25.6</td><td>4.3</td></tr><tr><td>LTIM</td><td>₹4,206.50</td><td style="color:#ff5252">-17.77%</td><td style="color:#ff5252">-32.91%</td><td>28.1</td><td>5.6</td></tr>
+    </table>
+  </div>
+
+</div>
+<footer>
+  Generated by Stock Deep Analyzer · 2026-03-15 20:20 · Data: Yahoo Finance
+</footer>
+</body>
+</html>

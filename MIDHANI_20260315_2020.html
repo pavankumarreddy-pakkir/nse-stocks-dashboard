@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MIDHANI — Deep Stock Analysis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; font-size: 14px; padding: 20px; }
+  h1 { font-size: 24px; color: #58a6ff; margin-bottom: 4px; }
+  h2 { font-size: 16px; color: #8b949e; font-weight: 400; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 20px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+  .card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #58a6ff; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; }
+  td, th { padding: 5px 8px; border-bottom: 1px solid #21262d; }
+  th { color: #8b949e; font-weight: 500; text-align: left; font-size: 12px; }
+  tr:last-child td { border-bottom: none; }
+  .score-box { text-align:center; padding: 20px; }
+  .score-num { font-size: 56px; font-weight: 700; color: #ffeb3b; }
+  .grade { font-size: 28px; color: #ffeb3b; }
+  .signal { font-size: 20px; font-weight: 600; color: #ffeb3b; margin-top: 8px; }
+  .price-big { font-size: 36px; font-weight: 700; }
+  .tag { display:inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  .meta { color: #8b949e; font-size: 12px; margin-top: 4px; }
+  footer { text-align:center; padding: 20px 0; color: #8b949e; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Mishra Dhatu Nigam Limited  <span style="color:#8b949e;font-size:16px">(MIDHANI.NS)</span></h1>
+<h2>Basic Materials  ·  Generated: 2026-03-15 20:20</h2>
+
+<div class="grid">
+
+  <!-- PRICE & VERDICT -->
+  <div class="card">
+    <h3>Price & Verdict</h3>
+    <div class="score-box">
+      <div class="price-big">₹312.90</div>
+      <div class="meta">-5.84% today</div>
+      <div style="margin-top:16px" class="score-num">50</div>
+      <div class="meta">/ 100 conviction score</div>
+      <div class="grade">Grade: C</div>
+      <div class="signal">NEUTRAL</div>
+    </div>
+  </div>
+
+  <!-- RETURNS -->
+  <div class="card">
+    <h3>Returns</h3>
+    <table>
+      <tr><th>Period</th><th>Return</th></tr>
+      <tr><td>1 Day</td><td style="color:#ff5252">-5.84%</td></tr>
+      <tr><td>1 Week</td><td style="color:#ff5252">-7.21%</td></tr>
+      <tr><td>1 Month</td><td style="color:#ff5252">-13.31%</td></tr>
+      <tr><td>3 Months</td><td style="color:#00e676">+7.32%</td></tr>
+      <tr><td>1 Year</td><td style="color:#00e676">+14.48%</td></tr>
+      <tr><td>Distance from 52W High</td><td style="color:#ff5252">-32.51%</td></tr>
+      <tr><td>Distance from 52W Low</td><td style="color:#00e676">+22.48%</td></tr>
+    </table>
+  </div>
+
+  <!-- TECHNICALS -->
+  <div class="card">
+    <h3>Technical Indicators</h3>
+    <table>
+      <tr><th>Indicator</th><th>Value</th></tr>
+      <tr><td>Trend</td><td style="color:#ff5252">BEARISH</td></tr>
+      <tr><td>RSI(14)</td><td>32.9</td></tr>
+      <tr><td>MACD</td><td>-6.718  /  Signal: -3.596</td></tr>
+      <tr><td>MACD Histogram</td><td style="color:#ff5252">-3.122</td></tr>
+      <tr><td>ADX(14)</td><td>12.5</td></tr>
+      <tr><td>+DI / -DI</td><td><span style="color:#00e676">18.7</span> / <span style="color:#ff5252">23.5</span></td></tr>
+      <tr><td>SMA20 / SMA50 / SMA200</td><td>₹345.9 / ₹351.8 / ₹376.6</td></tr>
+      <tr><td>Bollinger %B</td><td>-17.6%</td></tr>
+      <tr><td>Volume Ratio (vs 20d avg)</td><td style="color:#e6edf3">1.22x</td></tr>
+      <tr><td>OBV Trend</td><td style="color:#ff5252">FALLING</td></tr>
+    </table>
+  </div>
+
+  <!-- SUPPORT & RESISTANCE -->
+  <div class="card">
+    <h3>Support &amp; Resistance</h3>
+    <table>
+      <tr><th>Level</th><th>Price</th><th>Gap</th></tr>
+      <tr style="color:#ff5252"><td>Resistance R1</td><td>₹387.50</td><td>+23.8%</td></tr><tr style="color:#ff5252"><td>Resistance R2</td><td>₹377.80</td><td>+20.7%</td></tr><tr style="color:#ff5252"><td>Resistance R3</td><td>₹365.00</td><td>+16.7%</td></tr><tr style="color:#64b5f6;font-weight:bold"><td>► CURRENT</td><td>₹312.90</td><td>—</td></tr><tr style="color:#00e676"><td>Support S1</td><td>₹329.70</td><td>5.4%</td></tr><tr style="color:#00e676"><td>Support S2</td><td>₹336.90</td><td>7.7%</td></tr><tr style="color:#00e676"><td>Support S3</td><td>₹338.50</td><td>8.2%</td></tr>
+    </table>
+  </div>
+
+  <!-- ENTRY / EXIT -->
+  <div class="card">
+    <h3>Entry / Exit Zones</h3>
+    <table>
+      <tr><th></th><th></th></tr>
+      <tr><td>Entry Zone</td><td>₹297.25 → ₹314.46</td></tr>
+      <tr><td style="color:#ff5252">Stop Loss</td><td style="color:#ff5252">₹289.82  (risk 7.8%)</td></tr>
+      <tr><td style="color:#00e676">Target 1</td><td style="color:#00e676">₹365.00  (R:R = 2.05)</td></tr>
+      <tr><td style="color:#00e676">Target 2</td><td style="color:#00e676">₹348.98  (R:R = 1.4)</td></tr>
+      <tr><td style="color:#00e676">Target 3</td><td style="color:#00e676">₹472.87  (near 52W high)</td></tr>
+      <tr><td>ATR(14)</td><td>₹14.43</td></tr>
+      <tr><td>Setup Quality</td><td style="color:#00e676">GOOD SETUP</td></tr>
+    </table>
+  </div>
+
+  <!-- FUNDAMENTALS -->
+  <div class="card">
+    <h3>Fundamentals</h3>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Trailing P/E</td><td>53.49</td></tr>
+      <tr><td>Forward P/E</td><td>32.59</td></tr>
+      <tr><td>Price/Book</td><td>4.08</td></tr>
+      <tr><td>EPS (TTM)</td><td>5.85 ₹</td></tr>
+      <tr><td>ROE</td><td>N/A</td></tr>
+      <tr><td>ROA</td><td>N/A</td></tr>
+      <tr><td>Revenue Growth</td><td>15.80%</td></tr>
+      <tr><td>Earnings Growth</td><td>8.80%</td></tr>
+      <tr><td>Debt/Equity</td><td>23.47</td></tr>
+      <tr><td>Dividend Yield</td><td>51.00%</td></tr>
+    </table>
+  </div>
+
+  <!-- NEWS SENTIMENT -->
+  <div class="card" style="grid-column: span 2">
+    <h3>News Sentiment — <span style="color:#ffeb3b">NEUTRAL</span></h3>
+    <table>
+      <tr><th>Sentiment</th><th>Headline</th></tr>
+      <tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr><tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr><tr><td style="color:#bdbdbd">NEUTRAL</td><td></td></tr>
+    </table>
+  </div>
+
+  <!-- SECTOR PEER COMPARISON -->
+  <div class="card" style="grid-column: span 2">
+    <h3>Sector Peer Comparison — Basic Materials</h3>
+    <table>
+      <tr><th>Symbol</th><th>Price</th><th>1M Return</th><th>3M Return</th><th>P/E</th><th>P/B</th></tr>
+      <tr><td>TATASTEEL</td><td>₹183.51</td><td style="color:#ff5252">-9.68%</td><td style="color:#00e676">+6.15%</td><td>0.3</td><td>2.4</td></tr><tr><td>JSWSTEEL</td><td>₹1,119.30</td><td style="color:#ff5252">-9.15%</td><td style="color:#00e676">+0.40%</td><td>36.8</td><td>3.3</td></tr><tr><td>HINDALCO</td><td>₹910.05</td><td style="color:#00e676">0.12%</td><td style="color:#00e676">+7.34%</td><td>12.6</td><td>1.5</td></tr><tr><td>NATIONALUM</td><td>₹387.35</td><td style="color:#00e676">10.89%</td><td style="color:#00e676">+40.73%</td><td>11.6</td><td>3.6</td></tr><tr><td>VEDL</td><td>₹689.55</td><td style="color:#00e676">2.36%</td><td style="color:#00e676">+25.51%</td><td>19.2</td><td>6.7</td></tr>
+    </table>
+  </div>
+
+</div>
+<footer>
+  Generated by Stock Deep Analyzer · 2026-03-15 20:20 · Data: Yahoo Finance
+</footer>
+</body>
+</html>
